@@ -28,6 +28,7 @@
 
 #include "core/common.hpp"
 #include "core/scheduler.hpp"
+#include "core/spinlock.hpp"
 #include "forwarder-counters.hpp"
 #include "face-table.hpp"
 #include "unsolicited-data-policy.hpp"
@@ -38,6 +39,7 @@
 #include "table/strategy-choice.hpp"
 #include "table/dead-nonce-list.hpp"
 #include "table/network-region-table.hpp"
+
 
 namespace nfd {
 
@@ -111,7 +113,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessInterest(Face& face, const Interest& interest)
   {
+    getGlobalSpinlock()->lock();
     this->onIncomingInterest(face, interest);
+    getGlobalSpinlock()->unlock();
   }
 
   /** \brief start incoming Data processing
@@ -121,7 +125,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessData(Face& face, const Data& data)
   {
+    getGlobalSpinlock()->lock();
     this->onIncomingData(face, data);
+    getGlobalSpinlock()->unlock();
   }
 
   /** \brief start incoming Nack processing
@@ -131,7 +137,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessNack(Face& face, const lp::Nack& nack)
   {
+    getGlobalSpinlock()->lock();
     this->onIncomingNack(face, nack);
+    getGlobalSpinlock()->unlock();
   }
 
   NameTree&

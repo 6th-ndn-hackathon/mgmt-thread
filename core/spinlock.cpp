@@ -23,37 +23,17 @@
  * NFD, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NFD_CORE_SPINLOCK_HPP
-#define NFD_CORE_SPINLOCK_HPP
-
-#include <atomic>
-#include <thread>
+#include "spinlock.hpp"
 
 namespace nfd {
 
-class Spinlock {
-
-public:
-  Spinlock()
-    : m_flag(ATOMIC_FLAG_INIT)
-  {
-  }
-
-  void lock(){
-    while( m_flag.test_and_set() );
-  }
-
-  void unlock(){
-    m_flag.clear();
-  }
-
-private:
-  std::atomic_flag m_flag;
-};
-
 shared_ptr<Spinlock>
-getGlobalSpinlock();
+getGlobalSpinlock()
+{
+  static shared_ptr<Spinlock> g_lock = nullptr;
+  if (g_lock == nullptr)
+    g_lock = make_shared<Spinlock>();
+  return g_lock;
+}
 
 } // namespace nfd
-
-#endif // NFD_CORE_SPINLOCK_HPP
