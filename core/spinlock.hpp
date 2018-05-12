@@ -51,7 +51,7 @@ private:
   std::atomic_flag m_flag;
 };
 
-shared_ptr<Spinlock>
+Spinlock&
 getGlobalSpinlock();
 
 } // namespace nfd

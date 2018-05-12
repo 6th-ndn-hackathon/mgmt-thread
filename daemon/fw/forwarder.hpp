@@ -113,9 +113,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessInterest(Face& face, const Interest& interest)
   {
-    getGlobalSpinlock()->lock();
+    getGlobalSpinlock().lock();
     this->onIncomingInterest(face, interest);
-    getGlobalSpinlock()->unlock();
+    getGlobalSpinlock().unlock();
   }
 
   /** \brief start incoming Data processing
@@ -125,9 +125,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessData(Face& face, const Data& data)
   {
-    getGlobalSpinlock()->lock();
+    getGlobalSpinlock().lock();
     this->onIncomingData(face, data);
-    getGlobalSpinlock()->unlock();
+    getGlobalSpinlock().unlock();
   }
 
   /** \brief start incoming Nack processing
@@ -137,9 +137,9 @@ public: // forwarding entrypoints and tables
   void
   startProcessNack(Face& face, const lp::Nack& nack)
   {
-    getGlobalSpinlock()->lock();
+    getGlobalSpinlock().lock();
     this->onIncomingNack(face, nack);
-    getGlobalSpinlock()->unlock();
+    getGlobalSpinlock().unlock();
   }
 
   NameTree&

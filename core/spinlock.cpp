@@ -27,12 +27,10 @@
 
 namespace nfd {
 
-shared_ptr<Spinlock>
+Spinlock&
 getGlobalSpinlock()
 {
-  static shared_ptr<Spinlock> g_lock = nullptr;
-  if (g_lock == nullptr)
-    g_lock = make_shared<Spinlock>();
+  static Spinlock g_lock;
   return g_lock;
 }
 
