@@ -113,7 +113,7 @@ public:
 
     boost::asio::io_service* ribIo = nullptr;
     std::string configFile = this->m_configFile; // c++11 lambda cannot capture member variables
-    boost::thread ribThread([configFile, &retval, &ribIo, &m_mainIo, &cv, &m] {
+    boost::thread ribThread([this, configFile, &retval, &ribIo, &cv, &m] {
         {
           std::lock_guard<std::mutex> lock(m);
           ribIo = &getGlobalIoService();
