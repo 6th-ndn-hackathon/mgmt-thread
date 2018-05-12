@@ -48,9 +48,10 @@ NFD_LOG_INIT(Nfd);
 static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
 
 Nfd::Nfd(boost::asio::io_service& io, ndn::KeyChain& keyChain)
-  : m_io(io)
+  : m_fwStrand(io)
+  , m_mgmtStrand(io)
   , m_keyChain(keyChain)
-  , m_netmon(make_shared<ndn::net::NetworkMonitor>(m_io))
+  , m_netmon(make_shared<ndn::net::NetworkMonitor>(io))
 {
 }
 

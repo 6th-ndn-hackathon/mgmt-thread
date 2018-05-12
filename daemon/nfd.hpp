@@ -111,13 +111,14 @@ private:
   reloadConfigFileFaceSection();
 
 private:
-  boost::asio::io_service& m_io;
   std::string m_configFile;
   ConfigSection m_configSection;
 
+  boost::asio::io_service::strand m_fwStrand;
   unique_ptr<Forwarder> m_forwarder;
   unique_ptr<face::FaceSystem> m_faceSystem;
 
+  boost::asio::io_service::strand m_mgmtStrand;
   ndn::KeyChain& m_keyChain;
   shared_ptr<face::Face> m_internalFace;
   shared_ptr<ndn::Face> m_internalClientFace;
