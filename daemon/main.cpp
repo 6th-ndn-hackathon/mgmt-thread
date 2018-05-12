@@ -78,7 +78,8 @@ class NfdRunner : noncopyable
 public:
   explicit
   NfdRunner(const std::string& configFile)
-    : m_nfd(m_mainIo, configFile, m_nfdKeyChain)
+    : m_mainIo(getGlobalIoService()) // FIXME later
+    , m_nfd(m_mainIo, configFile, m_nfdKeyChain)
     , m_configFile(configFile)
     , m_terminationSignalSet(m_mainIo)
     , m_reloadSignalSet(m_mainIo)
@@ -194,7 +195,7 @@ public:
   }
 
 private:
-  boost::asio::io_service m_mainIo;
+  boost::asio::io_service& m_mainIo;
   ndn::KeyChain           m_nfdKeyChain;
   Nfd                     m_nfd;
   std::string             m_configFile;
