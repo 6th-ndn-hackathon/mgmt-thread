@@ -47,20 +47,21 @@ NFD_LOG_INIT(Nfd);
 
 static const std::string INTERNAL_CONFIG = "internal://nfd.conf";
 
-Nfd::Nfd(ndn::KeyChain& keyChain)
-  : m_keyChain(keyChain)
-  , m_netmon(make_shared<ndn::net::NetworkMonitor>(getGlobalIoService()))
+Nfd::Nfd(boost::asio::io_service& io, ndn::KeyChain& keyChain)
+  : m_io(io)
+  , m_keyChain(keyChain)
+  , m_netmon(make_shared<ndn::net::NetworkMonitor>(m_io))
 {
 }
 
-Nfd::Nfd(const std::string& configFile, ndn::KeyChain& keyChain)
-  : Nfd(keyChain)
+Nfd::Nfd(boost::asio::io_service& io, const std::string& configFile, ndn::KeyChain& keyChain)
+  : Nfd(io, keyChain)
 {
   m_configFile = configFile;
 }
 
-Nfd::Nfd(const ConfigSection& config, ndn::KeyChain& keyChain)
-  : Nfd(keyChain)
+Nfd::Nfd(boost::asio::io_service& io, const ConfigSection& config, ndn::KeyChain& keyChain)
+  : Nfd(io, keyChain)
 {
   m_configSection = config;
 }

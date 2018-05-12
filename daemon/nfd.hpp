@@ -66,16 +66,18 @@ public:
   /**
    * \brief Create NFD instance using absolute or relative path to \p configFile
    */
-  Nfd(const std::string& configFile, ndn::KeyChain& keyChain);
+  Nfd(boost::asio::io_service& io, const std::string& configFile, ndn::KeyChain& keyChain);
 
   /**
    * \brief Create NFD instance using a parsed ConfigSection \p config
+   *
    * This version of the constructor is more appropriate for integrated environments,
-   * such as NS-3 or android.
+   * such as NS-3 or Android.
+   *
    * \note When using this version of the constructor, error messages will include
-   *      "internal://nfd.conf" when referring to configuration errors.
+   *       "internal://nfd.conf" when referring to configuration errors.
    */
-  Nfd(const ConfigSection& config, ndn::KeyChain& keyChain);
+  Nfd(boost::asio::io_service& io, const ConfigSection& config, ndn::KeyChain& keyChain);
 
   /**
    * \brief Destructor
@@ -97,7 +99,7 @@ public:
 
 private:
   explicit
-  Nfd(ndn::KeyChain& keyChain);
+  Nfd(boost::asio::io_service& io, ndn::KeyChain& keyChain);
 
   void
   configureLogging();
@@ -109,6 +111,7 @@ private:
   reloadConfigFileFaceSection();
 
 private:
+  boost::asio::io_service& m_io;
   std::string m_configFile;
   ConfigSection m_configSection;
 
