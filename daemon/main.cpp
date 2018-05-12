@@ -78,10 +78,10 @@ class NfdRunner : noncopyable
 public:
   explicit
   NfdRunner(const std::string& configFile)
-    : m_nfd(configFile, m_nfdKeyChain)
+    : m_nfd(m_mainIo, configFile, m_nfdKeyChain)
     , m_configFile(configFile)
-    , m_terminationSignalSet(getGlobalIoService())
-    , m_reloadSignalSet(getGlobalIoService())
+    , m_terminationSignalSet(m_mainIo)
+    , m_reloadSignalSet(m_mainIo)
   {
     m_terminationSignalSet.add(SIGINT);
     m_terminationSignalSet.add(SIGTERM);
@@ -104,9 +104,6 @@ public:
     // a separate thread) fails.
     std::atomic_int retval(0);
 
-    boost::asio::io_service* const mainIo = &getGlobalIoService();
-    boost::asio::io_service* ribIo = nullptr;
-
     // Mutex and conditional variable to implement synchronization between main and RIB manager
     // threads:
     // - to block main thread until RIB manager thread starts and initializes ribIo (to allow
@@ -114,12 +111,12 @@ public:
     std::mutex m;
     std::condition_variable cv;
 
+    boost::asio::io_service* ribIo = nullptr;
     std::string configFile = this->m_configFile; // c++11 lambda cannot capture member variables
-    boost::thread ribThread([configFile, &retval, &ribIo, mainIo, &cv, &m] {
+    boost::thread ribThread([configFile, &retval, &ribIo, &m_mainIo, &cv, &m] {
         {
           std::lock_guard<std::mutex> lock(m);
           ribIo = &getGlobalIoService();
-          BOOST_ASSERT(ribIo != mainIo);
         }
         cv.notify_all(); // notify that ribIo has been assigned
 
@@ -133,7 +130,7 @@ public:
         catch (const std::exception& e) {
           NFD_LOG_FATAL(e.what());
           retval = 1;
-          mainIo->stop();
+          m_mainIo.stop();
         }
 
         {
@@ -150,7 +147,7 @@ public:
     }
 
     try {
-      mainIo->run();
+      m_mainIo.run();
     }
     catch (const std::exception& e) {
       NFD_LOG_FATAL(getExtendedErrorMessage(e));
@@ -181,7 +178,7 @@ public:
       return;
 
     NFD_LOG_INFO("Caught signal '" << ::strsignal(signalNo) << "', exiting...");
-    getGlobalIoService().stop();
+    m_mainIo.stop();
   }
 
   void
@@ -197,6 +194,7 @@ public:
   }
 
 private:
+  boost::asio::io_service m_mainIo;
   ndn::KeyChain           m_nfdKeyChain;
   Nfd                     m_nfd;
   std::string             m_configFile;
