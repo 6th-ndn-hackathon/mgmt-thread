@@ -56,6 +56,7 @@ StrategyChoiceManager::setStrategy(ControlParameters parameters,
   const Name& prefix = parameters.getName();
   const Name& strategy = parameters.getStrategy();
 
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   StrategyChoice::InsertResult res = m_table.insert(prefix, strategy);
   if (!res) {
     NFD_LOG_DEBUG("strategy-choice/set(" << prefix << "," << strategy << "): cannot-create " << res);
@@ -78,6 +79,7 @@ StrategyChoiceManager::unsetStrategy(ControlParameters parameters,
   const Name& prefix = parameters.getName();
   // no need to test for ndn:/ , parameter validation takes care of that
 
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   m_table.erase(parameters.getName());
 
   NFD_LOG_DEBUG("strategy-choice/unset(" << prefix << "): OK");

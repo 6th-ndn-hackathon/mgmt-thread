@@ -28,7 +28,7 @@
 namespace nfd {
 
 Spinlock&
-getGlobalSpinlock()
+getGlobalSpinlock() noexcept
 {
   static Spinlock g_lock;
   return g_lock;

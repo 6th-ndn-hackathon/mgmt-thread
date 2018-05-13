@@ -77,6 +77,7 @@ FibManager::addNextHop(const Name& topPrefix, const Interest& interest,
     return done(ControlResponse(410, "Face not found"));
   }
 
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   fib::Entry* entry = m_fib.insert(prefix).first;
   entry->addNextHop(*face, cost);
 
@@ -107,6 +108,7 @@ FibManager::removeNextHop(const Name& topPrefix, const Interest& interest,
     return;
   }
 
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   entry->removeNextHop(*face);
   if (!entry->hasNextHops()) {
     m_fib.erase(*entry);

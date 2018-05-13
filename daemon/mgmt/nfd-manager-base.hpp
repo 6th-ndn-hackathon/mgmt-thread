@@ -27,7 +27,10 @@
 #define NFD_DAEMON_MGMT_NFD_MANAGER_BASE_HPP
 
 #include "core/manager-base.hpp"
+#include "core/spinlock.hpp"
 #include "command-authenticator.hpp"
+
+#include <mutex>
 
 namespace nfd {
 

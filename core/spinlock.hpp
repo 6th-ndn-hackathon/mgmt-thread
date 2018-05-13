@@ -39,11 +39,11 @@ public:
   {
   }
 
-  void lock(){
+  void lock() noexcept {
     while( m_flag.test_and_set() );
   }
 
-  void unlock(){
+  void unlock() noexcept {
     m_flag.clear();
   }
 
@@ -52,7 +52,7 @@ private:
 };
 
 Spinlock&
-getGlobalSpinlock();
+getGlobalSpinlock() noexcept;
 
 } // namespace nfd
 

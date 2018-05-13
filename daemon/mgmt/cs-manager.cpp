@@ -50,6 +50,8 @@ CsManager::changeConfig(const ControlParameters& parameters,
 {
   using ndn::nfd::CsFlagBit;
 
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
+
   if (parameters.hasCapacity()) {
     m_cs.setLimit(parameters.getCapacity());
   }
