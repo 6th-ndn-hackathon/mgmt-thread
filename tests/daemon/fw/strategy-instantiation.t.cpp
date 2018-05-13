@@ -94,7 +94,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(InstanceName, T, Tests)
   uint64_t maxVersion = T::Strategy::getStrategyName().at(-1).toVersion();
   BOOST_REQUIRE_LE(T::getMinVersion(), maxVersion);
 
-  Forwarder forwarder;
+  boost::asio::io_service io;
+  boost::asio::io_service::strand strand(io);
+  Forwarder forwarder(strand);
   for (uint64_t version = T::getMinVersion(); version <= maxVersion; ++version) {
     Name versionedName = T::getVersionedStrategyName(version);
     unique_ptr<typename T::Strategy> instance;

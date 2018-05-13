@@ -45,8 +45,9 @@ class FaceSystemFixture : public virtual BaseFixture
 {
 public:
   FaceSystemFixture()
-    : netmon(make_shared<ndn::net::NetworkMonitorStub>(~0))
-    , faceSystem(faceTable, netmon)
+    : faceTable(g_strand)
+    , netmon(make_shared<ndn::net::NetworkMonitorStub>(~0))
+    , faceSystem(g_strand, faceTable, netmon)
   {
     faceSystem.setConfigFile(configFile);
   }

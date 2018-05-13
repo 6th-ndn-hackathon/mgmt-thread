@@ -220,7 +220,7 @@ EthernetFactory::createChannel(const shared_ptr<const ndn::net::NetworkInterface
   if (it != m_channels.end())
     return it->second;
 
-  auto channel = std::make_shared<EthernetChannel>(localEndpoint, idleTimeout);
+  auto channel = std::make_shared<EthernetChannel>(m_strand, localEndpoint, idleTimeout);
   m_channels[localEndpoint->getName()] = channel;
 
   return channel;
@@ -249,7 +249,7 @@ EthernetFactory::createMulticastFace(const ndn::net::NetworkInterface& netif,
   opts.allowReassembly = true;
 
   auto linkService = make_unique<GenericLinkService>(opts);
-  auto transport = make_unique<MulticastEthernetTransport>(netif, address, m_mcastConfig.linkType);
+  auto transport = make_unique<MulticastEthernetTransport>(m_strand, netif, address, m_mcastConfig.linkType);
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   m_mcastFaces[key] = face;

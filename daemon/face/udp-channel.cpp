@@ -26,7 +26,6 @@
 #include "udp-channel.hpp"
 #include "generic-link-service.hpp"
 #include "unicast-udp-transport.hpp"
-#include "core/global-io.hpp"
 
 namespace nfd {
 namespace face {
@@ -35,11 +34,13 @@ NFD_LOG_INIT(UdpChannel);
 
 namespace ip = boost::asio::ip;
 
-UdpChannel::UdpChannel(const udp::Endpoint& localEndpoint,
+UdpChannel::UdpChannel(boost::asio::io_service::strand& strand,
+                       const udp::Endpoint& localEndpoint,
                        time::nanoseconds idleTimeout,
                        bool wantCongestionMarking)
-  : m_localEndpoint(localEndpoint)
-  , m_socket(getGlobalIoService())
+  : m_strand(strand)
+  , m_localEndpoint(localEndpoint)
+  , m_socket(strand.get_io_service())
   , m_idleFaceTimeout(idleTimeout)
   , m_wantCongestionMarking(wantCongestionMarking)
 {
@@ -155,7 +156,7 @@ UdpChannel::createFace(const udp::Endpoint& remoteEndpoint,
   }
 
   // else, create a new face
-  ip::udp::socket socket(getGlobalIoService(), m_localEndpoint.protocol());
+  ip::udp::socket socket(m_strand.get_io_service(), m_localEndpoint.protocol());
   socket.set_option(ip::udp::socket::reuse_address(true));
   socket.bind(m_localEndpoint);
   socket.connect(remoteEndpoint);
@@ -179,7 +180,8 @@ UdpChannel::createFace(const udp::Endpoint& remoteEndpoint,
   }
 
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<UnicastUdpTransport>(std::move(socket), params.persistency, m_idleFaceTimeout);
+  auto transport = make_unique<UnicastUdpTransport>(m_strand, std::move(socket), params.persistency,
+                                                    m_idleFaceTimeout);
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   m_channelFaces[remoteEndpoint] = face;

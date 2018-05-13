@@ -44,7 +44,7 @@ class UnixStreamTransport final : public StreamTransport<boost::asio::local::str
 {
 public:
   explicit
-  UnixStreamTransport(protocol::socket&& socket);
+  UnixStreamTransport(boost::asio::io_service::strand& strand, protocol::socket&& socket);
 };
 
 } // namespace face

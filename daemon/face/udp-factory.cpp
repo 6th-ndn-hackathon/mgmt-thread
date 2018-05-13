@@ -26,7 +26,6 @@
 #include "udp-factory.hpp"
 #include "generic-link-service.hpp"
 #include "multicast-udp-transport.hpp"
-#include "core/global-io.hpp"
 
 #include <ndn-cxx/net/address-converter.hpp>
 #include <boost/range/adaptor/map.hpp>
@@ -297,7 +296,8 @@ UdpFactory::createChannel(const udp::Endpoint& localEndpoint,
                                 ", endpoint already allocated for a UDP multicast face"));
   }
 
-  auto channel = std::make_shared<UdpChannel>(localEndpoint, idleTimeout, m_wantCongestionMarking);
+  auto channel = std::make_shared<UdpChannel>(m_strand, localEndpoint, idleTimeout,
+                                              m_wantCongestionMarking);
   m_channels[localEndpoint] = channel;
 
   return channel;
@@ -345,16 +345,16 @@ UdpFactory::createMulticastFace(const shared_ptr<const net::NetworkInterface>& n
                                 ", endpoint already allocated for a UDP channel"));
   }
 
-  ip::udp::socket rxSock(getGlobalIoService());
+  ip::udp::socket rxSock(m_strand.get_io_service());
   MulticastUdpTransport::openRxSocket(rxSock, mcastEp, localAddress, netif);
-  ip::udp::socket txSock(getGlobalIoService());
+  ip::udp::socket txSock(m_strand.get_io_service());
   MulticastUdpTransport::openTxSocket(txSock, udp::Endpoint(localAddress, 0), netif);
 
   GenericLinkService::Options options;
   options.allowCongestionMarking = m_wantCongestionMarking;
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<MulticastUdpTransport>(mcastEp, std::move(rxSock), std::move(txSock),
-                                                      m_mcastConfig.linkType);
+  auto transport = make_unique<MulticastUdpTransport>(m_strand, mcastEp, std::move(rxSock),
+                                                      std::move(txSock), m_mcastConfig.linkType);
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   m_mcastFaces[localEp] = face;

@@ -44,7 +44,7 @@ protected:
     if (port == 0)
       port = getNextPort();
 
-    return make_unique<UdpChannel>(udp::Endpoint(addr, port), time::seconds(2), false);
+    return make_unique<UdpChannel>(g_strand, udp::Endpoint(addr, port), time::seconds(2), false);
   }
 
   void

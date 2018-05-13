@@ -41,7 +41,8 @@ public:
   /**
    * @brief Creates an Ethernet-based transport for unicast communication
    */
-  UnicastEthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+  UnicastEthernetTransport(boost::asio::io_service::strand& strand,
+                           const ndn::net::NetworkInterface& localEndpoint,
                            const ethernet::Address& remoteEndpoint,
                            ndn::nfd::FacePersistency persistency,
                            time::nanoseconds idleTimeout);

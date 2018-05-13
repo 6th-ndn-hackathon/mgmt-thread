@@ -50,7 +50,9 @@ struct ProtocolFactoryCtorParams;
 class FaceSystem : noncopyable
 {
 public:
-  FaceSystem(FaceTable& faceTable, shared_ptr<ndn::net::NetworkMonitor> netmon);
+  FaceSystem(boost::asio::io_service::strand& strand,
+             FaceTable& faceTable,
+             shared_ptr<ndn::net::NetworkMonitor> netmon);
 
   ~FaceSystem();
 
@@ -117,8 +119,8 @@ private:
    */
   std::map<std::string, ProtocolFactory*> m_factoryByScheme;
 
+  boost::asio::io_service::strand& m_strand;
   FaceTable& m_faceTable;
-
   shared_ptr<ndn::net::NetworkMonitor> m_netmon;
 };
 

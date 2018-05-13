@@ -121,7 +121,7 @@ public:
 
 BOOST_AUTO_TEST_CASE(UnsatisfiedInterest)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(UnsatisfiedInterest)
 
 BOOST_AUTO_TEST_CASE(SatisfiedInterest)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(SatisfiedInterest)
 
 BOOST_AUTO_TEST_CASE(CsHit)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE(CsHit)
 
 BOOST_AUTO_TEST_CASE(ReceiveNack)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(ReceiveNack)
 
 BOOST_AUTO_TEST_CASE(ResetTimerAfterReceiveInterest)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face = make_shared<DummyFace>();
   forwarder.addFace(face);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(ResetTimerAfterReceiveInterest)
 
 BOOST_AUTO_TEST_CASE(ResetTimerBeforeSatisfyInterest)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -326,7 +326,7 @@ BOOST_AUTO_TEST_CASE(ResetTimerBeforeSatisfyInterest)
 
 BOOST_AUTO_TEST_CASE(ResetTimerAfterReceiveData)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE(ResetTimerAfterReceiveData)
 
 BOOST_AUTO_TEST_CASE(ReceiveNackAfterResetTimer)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();

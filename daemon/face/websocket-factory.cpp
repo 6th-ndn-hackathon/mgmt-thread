@@ -132,7 +132,7 @@ WebSocketFactory::createChannel(const websocket::Endpoint& endpoint)
   if (it != m_channels.end())
     return it->second;
 
-  auto channel = make_shared<WebSocketChannel>(endpoint);
+  auto channel = make_shared<WebSocketChannel>(m_strand, endpoint);
   m_channels[endpoint] = channel;
 
   return channel;

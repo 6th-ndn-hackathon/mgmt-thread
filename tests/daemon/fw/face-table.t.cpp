@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2016,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -36,7 +36,7 @@ BOOST_FIXTURE_TEST_SUITE(TestFaceTable, BaseFixture)
 
 BOOST_AUTO_TEST_CASE(AddRemove)
 {
-  FaceTable faceTable;
+  FaceTable faceTable(g_strand);
 
   std::vector<FaceId> addHistory;
   std::vector<FaceId> removeHistory;
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(AddRemove)
 
 BOOST_AUTO_TEST_CASE(AddReserved)
 {
-  FaceTable faceTable;
+  FaceTable faceTable(g_strand);
 
   shared_ptr<Face> face1 = make_shared<DummyFace>();
   BOOST_CHECK_EQUAL(face1->getId(), face::INVALID_FACEID);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(AddReserved)
 
 BOOST_AUTO_TEST_CASE(Enumerate)
 {
-  FaceTable faceTable;
+  FaceTable faceTable(g_strand);
 
   shared_ptr<Face> face1 = make_shared<DummyFace>();
   shared_ptr<Face> face2 = make_shared<DummyFace>();

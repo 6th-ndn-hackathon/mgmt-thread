@@ -48,7 +48,7 @@ protected:
   unique_ptr<UnixStreamChannel>
   makeChannel() final
   {
-    return make_unique<UnixStreamChannel>(listenerEp, false);
+    return make_unique<UnixStreamChannel>(g_strand, listenerEp, false);
   }
 
   void

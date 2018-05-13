@@ -82,6 +82,9 @@ private:
 class InternalClientTransport : public ndn::Transport, public InternalTransportBase
 {
 public:
+  explicit
+  InternalClientTransport(boost::asio::io_service::strand& strand);
+
   /** \brief connect to a forwarder-side transport
    *  \param forwarderTransport the forwarder-side transport to connect to; may be nullptr
    *
@@ -119,6 +122,8 @@ public:
 
 private:
   NFD_LOG_MEMBER_DECL();
+
+  boost::asio::io_service::strand& m_strand;
 
   signal::ScopedConnection m_fwToClientTransmitConn;
   signal::ScopedConnection m_clientToFwTransmitConn;

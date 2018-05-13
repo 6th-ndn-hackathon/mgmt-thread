@@ -32,11 +32,12 @@ namespace face {
 
 NFD_LOG_INIT(UnicastEthernetTransport);
 
-UnicastEthernetTransport::UnicastEthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+UnicastEthernetTransport::UnicastEthernetTransport(boost::asio::io_service::strand& strand,
+                                                   const ndn::net::NetworkInterface& localEndpoint,
                                                    const ethernet::Address& remoteEndpoint,
                                                    ndn::nfd::FacePersistency persistency,
                                                    time::nanoseconds idleTimeout)
-  : EthernetTransport(localEndpoint, remoteEndpoint)
+  : EthernetTransport(strand, localEndpoint, remoteEndpoint)
   , m_idleTimeout(idleTimeout)
 {
   this->setLocalUri(FaceUri::fromDev(m_interfaceName));

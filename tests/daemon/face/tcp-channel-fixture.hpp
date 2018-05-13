@@ -49,7 +49,7 @@ protected:
     if (port == 0)
       port = getNextPort();
 
-    return make_unique<TcpChannel>(tcp::Endpoint(addr, port), false,
+    return make_unique<TcpChannel>(g_strand, tcp::Endpoint(addr, port), false,
                                    std::bind(&TcpChannelFixture::determineFaceScope, this, _1, _2));
   }
 

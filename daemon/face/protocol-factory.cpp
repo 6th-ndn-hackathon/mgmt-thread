@@ -59,7 +59,8 @@ ProtocolFactory::listRegistered()
 }
 
 ProtocolFactory::ProtocolFactory(const CtorParams& params)
-  : addFace(params.addFace)
+  : m_strand(params.strand)
+  , addFace(params.addFace)
   , netmon(params.netmon)
 {
   BOOST_ASSERT(addFace != nullptr);

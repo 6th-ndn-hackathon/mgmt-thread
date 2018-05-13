@@ -31,6 +31,7 @@ namespace tests {
 
 BaseFixture::BaseFixture()
   : g_io(getGlobalIoService())
+  , g_strand(g_io)
 {
 }
 

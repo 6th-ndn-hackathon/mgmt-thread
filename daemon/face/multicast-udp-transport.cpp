@@ -42,11 +42,12 @@ namespace face {
 
 NFD_LOG_MEMBER_INIT_SPECIALIZED((DatagramTransport<boost::asio::ip::udp, Multicast>), MulticastUdpTransport);
 
-MulticastUdpTransport::MulticastUdpTransport(const protocol::endpoint& multicastGroup,
+MulticastUdpTransport::MulticastUdpTransport(boost::asio::io_service::strand& strand,
+                                             const protocol::endpoint& multicastGroup,
                                              protocol::socket&& recvSocket,
                                              protocol::socket&& sendSocket,
                                              ndn::nfd::LinkType linkType)
-  : DatagramTransport(std::move(recvSocket))
+  : DatagramTransport(strand, std::move(recvSocket))
   , m_multicastGroup(multicastGroup)
   , m_sendSocket(std::move(sendSocket))
 {

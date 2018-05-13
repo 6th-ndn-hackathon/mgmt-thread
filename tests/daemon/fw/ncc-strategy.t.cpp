@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2016,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(FavorRespondingUpstream)
   // and favors this upstream in subsequent Interests.
 
   LimitedIo limitedIo(this);
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NccStrategyTester& strategy = choose<NccStrategyTester>(forwarder);
   strategy.afterAction.connect(bind(&LimitedIo::afterOp, &limitedIo));
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(FavorRespondingUpstream)
 
 BOOST_AUTO_TEST_CASE(Bug1853)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NccStrategyTester& strategy = choose<NccStrategyTester>(forwarder);
 
   shared_ptr<DummyFace> face1 = make_shared<DummyFace>();
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(Bug1853)
 BOOST_AUTO_TEST_CASE(Bug1961)
 {
   LimitedIo limitedIo(this);
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NccStrategyTester& strategy = choose<NccStrategyTester>(forwarder);
   strategy.afterAction.connect(bind(&LimitedIo::afterOp, &limitedIo));
 
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(Bug1961)
 BOOST_AUTO_TEST_CASE(Bug1971)
 {
   LimitedIo limitedIo(this);
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NccStrategyTester& strategy = choose<NccStrategyTester>(forwarder);
   strategy.afterAction.connect(bind(&LimitedIo::afterOp, &limitedIo));
 
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(Bug1971)
 
 BOOST_AUTO_TEST_CASE(Bug1998)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NccStrategyTester& strategy = choose<NccStrategyTester>(forwarder);
 
   shared_ptr<DummyFace> face1 = make_shared<DummyFace>();

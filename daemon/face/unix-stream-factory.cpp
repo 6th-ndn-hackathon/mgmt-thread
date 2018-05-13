@@ -104,7 +104,7 @@ UnixStreamFactory::createChannel(const std::string& unixSocketPath)
   if (channel)
     return channel;
 
-  channel = make_shared<UnixStreamChannel>(endpoint, m_wantCongestionMarking);
+  channel = make_shared<UnixStreamChannel>(m_strand, endpoint, m_wantCongestionMarking);
   m_channels[endpoint] = channel;
   return channel;
 }

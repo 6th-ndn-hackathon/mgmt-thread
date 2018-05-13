@@ -59,7 +59,8 @@ public:
    * To enable creation of faces upon incoming connections,
    * one needs to explicitly call EthernetChannel::listen method.
    */
-  EthernetChannel(shared_ptr<const ndn::net::NetworkInterface> localEndpoint,
+  EthernetChannel(boost::asio::io_service::strand& strand,
+                  shared_ptr<const ndn::net::NetworkInterface> localEndpoint,
                   time::nanoseconds idleTimeout);
 
   bool
@@ -123,6 +124,7 @@ private:
   updateFilter();
 
 private:
+  boost::asio::io_service::strand& m_strand;
   shared_ptr<const ndn::net::NetworkInterface> m_localEndpoint;
   bool m_isListening;
   boost::asio::posix::stream_descriptor m_socket;

@@ -201,7 +201,7 @@ TcpFactory::createChannel(const tcp::Endpoint& endpoint)
   if (it != m_channels.end())
     return it->second;
 
-  auto channel = make_shared<TcpChannel>(endpoint, m_wantCongestionMarking,
+  auto channel = make_shared<TcpChannel>(m_strand, endpoint, m_wantCongestionMarking,
                                          bind(&TcpFactory::determineFaceScopeFromAddresses, this, _1, _2));
   m_channels[endpoint] = channel;
   return channel;

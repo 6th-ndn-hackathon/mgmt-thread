@@ -24,7 +24,6 @@
  */
 
 #include "face-table.hpp"
-#include "core/global-io.hpp"
 #include "core/logger.hpp"
 #include "face/channel.hpp"
 
@@ -36,8 +35,9 @@ NDN_CXX_ASSERT_FORWARD_ITERATOR(FaceTable::const_iterator);
 
 NFD_LOG_INIT(FaceTable);
 
-FaceTable::FaceTable()
-  : m_lastFaceId(face::FACEID_RESERVED_MAX)
+FaceTable::FaceTable(boost::asio::io_service::strand& strand)
+  : m_strand(strand)
+  , m_lastFaceId(face::FACEID_RESERVED_MAX)
 {
 }
 
@@ -108,7 +108,7 @@ FaceTable::remove(FaceId faceId)
                " local=" << face->getLocalUri());
 
   // defer Face deallocation, so that Transport isn't deallocated during afterStateChange signal
-  getGlobalIoService().post([face] {});
+  m_strand.post([face] {});
 }
 
 FaceTable::ForwardRange

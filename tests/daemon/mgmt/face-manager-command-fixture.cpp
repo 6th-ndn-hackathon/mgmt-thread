@@ -30,11 +30,13 @@
 namespace nfd {
 namespace tests {
 
-FaceManagerCommandNode::FaceManagerCommandNode(ndn::KeyChain& keyChain, uint16_t port)
+FaceManagerCommandNode::FaceManagerCommandNode(boost::asio::io_service::strand& strand,
+                                               ndn::KeyChain& keyChain, uint16_t port)
   : face(getGlobalIoService(), keyChain, {true, true})
   , dispatcher(face, keyChain, ndn::security::SigningInfo())
   , authenticator(CommandAuthenticator::create())
-  , faceSystem(faceTable, make_shared<ndn::net::NetworkMonitorStub>(0))
+  , faceTable(strand)
+  , faceSystem(strand, faceTable, make_shared<ndn::net::NetworkMonitorStub>(0))
   , manager(faceSystem, dispatcher, *authenticator)
 {
   dispatcher.addTopPrefix("/localhost/nfd");
@@ -106,8 +108,8 @@ FaceManagerCommandNode::findFaceIdByUri(const std::string& uri) const
 }
 
 FaceManagerCommandFixture::FaceManagerCommandFixture()
-  : node1(m_keyChain, 16363)
-  , node2(m_keyChain, 26363)
+  : node1(g_strand, m_keyChain, 16363)
+  , node2(g_strand, m_keyChain, 26363)
 {
   advanceClocks(1_ms, 5);
 }

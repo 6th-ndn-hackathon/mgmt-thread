@@ -24,7 +24,6 @@
  */
 
 #include "multicast-ethernet-transport.hpp"
-#include "core/global-io.hpp"
 
 #include <cerrno>         // for errno
 #include <cstring>        // for memcpy(), strerror(), strncpy()
@@ -48,10 +47,11 @@ namespace face {
 
 NFD_LOG_INIT(MulticastEthernetTransport);
 
-MulticastEthernetTransport::MulticastEthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+MulticastEthernetTransport::MulticastEthernetTransport(boost::asio::io_service::strand& strand,
+                                                       const ndn::net::NetworkInterface& localEndpoint,
                                                        const ethernet::Address& mcastAddress,
                                                        ndn::nfd::LinkType linkType)
-  : EthernetTransport(localEndpoint, mcastAddress)
+  : EthernetTransport(strand, localEndpoint, mcastAddress)
 #if defined(__linux__)
   , m_interfaceIndex(localEndpoint.getIndex())
 #endif
@@ -106,7 +106,7 @@ MulticastEthernetTransport::joinMulticastGroup()
 #if defined(__APPLE__) || defined(__FreeBSD__)
   // see bug #2327
   using boost::asio::ip::udp;
-  udp::socket sock(getGlobalIoService(), udp::v4());
+  udp::socket sock(m_strand.get_io_service(), udp::v4());
   int fd = sock.native_handle();
 
   // Differences between Linux and the BSDs (including macOS):

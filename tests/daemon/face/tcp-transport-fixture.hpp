@@ -98,7 +98,7 @@ protected:
     }
 
     face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
-                             make_unique<TcpTransport>(std::move(sock), persistency, scope));
+                             make_unique<TcpTransport>(g_strand, std::move(sock), persistency, scope));
     transport = static_cast<TcpTransport*>(face->getTransport());
     receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
 

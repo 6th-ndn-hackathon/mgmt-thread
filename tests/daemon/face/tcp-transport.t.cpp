@@ -118,8 +118,9 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(PermanentReconnect, T, TcpTransportFixtures, T)
 class PermanentTcpTransportReconnectObserver : public TcpTransport
 {
 public:
-  PermanentTcpTransportReconnectObserver(protocol::socket&& socket, LimitedIo& io)
-    : TcpTransport(std::move(socket), ndn::nfd::FACE_PERSISTENCY_PERMANENT, ndn::nfd::FACE_SCOPE_LOCAL)
+  PermanentTcpTransportReconnectObserver(boost::asio::io_service::strand& strand,
+                                         protocol::socket&& socket, LimitedIo& io)
+    : TcpTransport(strand, std::move(socket), ndn::nfd::FACE_PERSISTENCY_PERMANENT, ndn::nfd::FACE_SCOPE_LOCAL)
     , m_io(io)
   {
   }
@@ -176,8 +177,9 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(PermanentReconnectWithExponentialBackoff, T, Tc
   });
   BOOST_REQUIRE_EQUAL(this->limitedIo.run(2, 1_s), LimitedIo::EXCEED_OPS);
 
-  auto transportObserver =
-    make_unique<PermanentTcpTransportReconnectObserver>(std::move(sock), std::ref(this->limitedIo));
+  auto transportObserver = make_unique<PermanentTcpTransportReconnectObserver>(this->g_strand,
+                                                                               std::move(sock),
+                                                                               std::ref(this->limitedIo));
   BOOST_REQUIRE_EQUAL(transportObserver->getState(), TransportState::UP);
 
   // break the TCP connection

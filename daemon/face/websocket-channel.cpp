@@ -26,15 +26,16 @@
 #include "websocket-channel.hpp"
 #include "generic-link-service.hpp"
 #include "websocket-transport.hpp"
-#include "core/global-io.hpp"
 
 namespace nfd {
 namespace face {
 
 NFD_LOG_INIT(WebSocketChannel);
 
-WebSocketChannel::WebSocketChannel(const websocket::Endpoint& localEndpoint)
-  : m_localEndpoint(localEndpoint)
+WebSocketChannel::WebSocketChannel(boost::asio::io_service::strand& strand,
+                                   const websocket::Endpoint& localEndpoint)
+  : m_strand(strand)
+  , m_localEndpoint(localEndpoint)
   , m_pingInterval(10_s)
 {
   setUri(FaceUri(m_localEndpoint, "ws"));
@@ -45,7 +46,7 @@ WebSocketChannel::WebSocketChannel(const websocket::Endpoint& localEndpoint)
   m_server.clear_error_channels(websocketpp::log::elevel::all);
 
   // Setup WebSocket server
-  m_server.init_asio(&getGlobalIoService());
+  m_server.init_asio(&m_strand.get_io_service());
   m_server.set_open_handler(bind(&WebSocketChannel::handleOpen, this, _1));
   m_server.set_close_handler(bind(&WebSocketChannel::handleClose, this, _1));
   m_server.set_message_handler(bind(&WebSocketChannel::handleMessage, this, _1, _2));

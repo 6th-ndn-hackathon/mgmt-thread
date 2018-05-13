@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2016,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(Basic)
 
 BOOST_AUTO_TEST_CASE(RemoveFibNexthops)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   NameTree& nameTree = forwarder.getNameTree();
   Fib& fib = forwarder.getFib();
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(RemoveFibNexthops)
 
 BOOST_AUTO_TEST_CASE(DeletePitInOutRecords)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   Pit& pit = forwarder.getPit();
 
   shared_ptr<Face> face1 = make_shared<DummyFace>();

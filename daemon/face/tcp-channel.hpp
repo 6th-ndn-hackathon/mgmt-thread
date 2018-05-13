@@ -56,7 +56,9 @@ public:
    * To enable creation faces upon incoming connections,
    * one needs to explicitly call TcpChannel::listen method.
    */
-  TcpChannel(const tcp::Endpoint& localEndpoint, bool wantCongestionMarking,
+  TcpChannel(boost::asio::io_service::strand& strand,
+             const tcp::Endpoint& localEndpoint,
+             bool wantCongestionMarking,
              DetermineFaceScopeFromAddress determineFaceScope);
 
   bool
@@ -125,6 +127,7 @@ private:
                        const FaceCreationFailedCallback& onConnectFailed);
 
 private:
+  boost::asio::io_service::strand& m_strand;
   const tcp::Endpoint m_localEndpoint;
   boost::asio::ip::tcp::acceptor m_acceptor;
   boost::asio::ip::tcp::socket m_socket;

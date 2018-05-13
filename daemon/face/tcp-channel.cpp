@@ -24,7 +24,6 @@
  */
 
 #include "tcp-channel.hpp"
-#include "core/global-io.hpp"
 #include "generic-link-service.hpp"
 #include "tcp-transport.hpp"
 
@@ -35,11 +34,14 @@ NFD_LOG_INIT(TcpChannel);
 
 namespace ip = boost::asio::ip;
 
-TcpChannel::TcpChannel(const tcp::Endpoint& localEndpoint, bool wantCongestionMarking,
+TcpChannel::TcpChannel(boost::asio::io_service::strand& strand,
+                       const tcp::Endpoint& localEndpoint,
+                       bool wantCongestionMarking,
                        DetermineFaceScopeFromAddress determineFaceScope)
-  : m_localEndpoint(localEndpoint)
-  , m_acceptor(getGlobalIoService())
-  , m_socket(getGlobalIoService())
+  : m_strand(strand)
+  , m_localEndpoint(localEndpoint)
+  , m_acceptor(strand.get_io_service())
+  , m_socket(strand.get_io_service())
   , m_wantCongestionMarking(wantCongestionMarking)
   , m_determineFaceScope(std::move(determineFaceScope))
 {
@@ -83,7 +85,7 @@ TcpChannel::connect(const tcp::Endpoint& remoteEndpoint,
     return;
   }
 
-  auto clientSocket = make_shared<ip::tcp::socket>(ref(getGlobalIoService()));
+  auto clientSocket = make_shared<ip::tcp::socket>(ref(m_strand.get_io_service()));
   auto timeoutEvent = scheduler::schedule(timeout, bind(&TcpChannel::handleConnectTimeout, this,
                                                         remoteEndpoint, clientSocket, onConnectFailed));
 
@@ -126,7 +128,7 @@ TcpChannel::createFace(ip::tcp::socket&& socket,
     auto linkService = make_unique<GenericLinkService>(options);
     auto faceScope = m_determineFaceScope(socket.local_endpoint().address(),
                                           socket.remote_endpoint().address());
-    auto transport = make_unique<TcpTransport>(std::move(socket), params.persistency, faceScope);
+    auto transport = make_unique<TcpTransport>(m_strand, std::move(socket), params.persistency, faceScope);
     face = make_shared<Face>(std::move(linkService), std::move(transport));
 
     m_channelFaces[remoteEndpoint] = face;

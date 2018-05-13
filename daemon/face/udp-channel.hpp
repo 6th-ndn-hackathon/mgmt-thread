@@ -47,7 +47,8 @@ public:
    * one needs to explicitly call UdpChannel::listen method.
    * The created socket is bound to \p localEndpoint.
    */
-  UdpChannel(const udp::Endpoint& localEndpoint,
+  UdpChannel(boost::asio::io_service::strand& strand,
+             const udp::Endpoint& localEndpoint,
              time::nanoseconds idleTimeout,
              bool wantCongestionMarking);
 
@@ -107,6 +108,7 @@ private:
              const FaceParams& params);
 
 private:
+  boost::asio::io_service::strand& m_strand;
   const udp::Endpoint m_localEndpoint;
   udp::Endpoint m_remoteEndpoint; ///< The latest peer that started communicating with us
   boost::asio::ip::udp::socket m_socket; ///< Socket used to "accept" new peers

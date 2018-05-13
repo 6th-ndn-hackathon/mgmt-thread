@@ -44,7 +44,10 @@ NFD_LOG_MEMBER_DECL_SPECIALIZED(StreamTransport<boost::asio::ip::tcp>);
 class TcpTransport FINAL_UNLESS_WITH_TESTS : public StreamTransport<boost::asio::ip::tcp>
 {
 public:
-  TcpTransport(protocol::socket&& socket, ndn::nfd::FacePersistency persistency, ndn::nfd::FaceScope faceScope);
+  TcpTransport(boost::asio::io_service::strand& strand,
+               protocol::socket&& socket,
+               ndn::nfd::FacePersistency persistency,
+               ndn::nfd::FaceScope faceScope);
 
   ssize_t
   getSendQueueLength() final;

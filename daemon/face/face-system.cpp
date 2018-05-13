@@ -25,7 +25,6 @@
 
 #include "face-system.hpp"
 #include "protocol-factory.hpp"
-#include "core/global-io.hpp"
 #include "fw/face-table.hpp"
 
 namespace nfd {
@@ -33,8 +32,11 @@ namespace face {
 
 NFD_LOG_INIT(FaceSystem);
 
-FaceSystem::FaceSystem(FaceTable& faceTable, shared_ptr<ndn::net::NetworkMonitor> netmon)
-  : m_faceTable(faceTable)
+FaceSystem::FaceSystem(boost::asio::io_service::strand& strand,
+                       FaceTable& faceTable,
+                       shared_ptr<ndn::net::NetworkMonitor> netmon)
+  : m_strand(strand)
+  , m_faceTable(faceTable)
   , m_netmon(std::move(netmon))
 {
   auto pfCtorParams = this->makePFCtorParams();
@@ -48,7 +50,7 @@ ProtocolFactoryCtorParams
 FaceSystem::makePFCtorParams()
 {
   auto addFace = bind(&FaceTable::add, &m_faceTable, _1);
-  return {addFace, m_netmon};
+  return {m_strand, addFace, m_netmon};
 }
 
 FaceSystem::~FaceSystem() = default;
