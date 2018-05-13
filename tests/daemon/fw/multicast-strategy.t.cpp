@@ -42,7 +42,8 @@ class MulticastStrategyFixture : public UnitTestTimeFixture
 {
 protected:
   MulticastStrategyFixture()
-    : strategy(forwarder)
+    : forwarder(g_strand)
+    , strategy(forwarder)
     , fib(forwarder.getFib())
     , pit(forwarder.getPit())
     , face1(make_shared<DummyFace>())

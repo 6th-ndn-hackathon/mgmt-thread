@@ -40,7 +40,8 @@ public:
   /**
    * @brief Creates an Ethernet-based transport for multicast communication
    */
-  MulticastEthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+  MulticastEthernetTransport(boost::asio::io_service::strand& strand,
+                             const ndn::net::NetworkInterface& localEndpoint,
                              const ethernet::Address& mcastAddress,
                              ndn::nfd::LinkType linkType);
 

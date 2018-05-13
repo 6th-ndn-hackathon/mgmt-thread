@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2017,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -24,8 +24,9 @@
  */
 
 #include "topology-tester.hpp"
-#include <ndn-cxx/encoding/encoding-buffer-fwd.hpp>
 #include "face/generic-link-service.hpp"
+
+#include <ndn-cxx/encoding/encoding-buffer-fwd.hpp>
 
 namespace nfd {
 namespace fw {
@@ -103,9 +104,10 @@ TopologyLink::scheduleReceive(InternalTransportBase* recipient, const Block& pac
 }
 
 TopologyAppLink::TopologyAppLink(shared_ptr<Face> forwarderFace)
-  : m_face(forwarderFace)
+  : m_strand(getGlobalIoService())
+  , m_face(forwarderFace)
   , m_forwarderTransport(static_cast<InternalForwarderTransport*>(forwarderFace->getTransport()))
-  , m_clientTransport(make_shared<InternalClientTransport>())
+  , m_clientTransport(make_shared<InternalClientTransport>(m_strand))
   , m_client(make_shared<ndn::Face>(m_clientTransport, getGlobalIoService()))
 {
   this->recover();
@@ -154,11 +156,16 @@ private:
   }
 };
 
+TopologyTester::TopologyTester()
+  : m_strand(getGlobalIoService())
+{
+}
+
 TopologyNode
 TopologyTester::addForwarder(const std::string& label)
 {
   size_t i = m_forwarders.size();
-  m_forwarders.push_back(make_unique<Forwarder>());
+  m_forwarders.push_back(make_unique<Forwarder>(m_strand));
   m_forwarderLabels.push_back(label);
   BOOST_ASSERT(m_forwarders.size() == m_forwarderLabels.size());
   return i;

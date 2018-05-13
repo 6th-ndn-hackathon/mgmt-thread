@@ -62,7 +62,7 @@ protected:
 
     face = make_unique<Face>(
              make_unique<DummyReceiveLinkService>(),
-             make_unique<UnicastUdpTransport>(std::move(sock), persistency, time::seconds(3)));
+             make_unique<UnicastUdpTransport>(g_strand, std::move(sock), persistency, time::seconds(3)));
     transport = static_cast<UnicastUdpTransport*>(face->getTransport());
     receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
 

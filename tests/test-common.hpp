@@ -61,9 +61,12 @@ protected:
   ~BaseFixture();
 
 protected:
-  /** \brief reference to global io_service
+  /** \brief reference to the global io_service
    */
   boost::asio::io_service& g_io;
+  /** \brief the global strand used for unit tests
+   */
+  boost::asio::io_service::strand g_strand;
 };
 
 /** \brief a base test fixture that overrides steady clock and system clock

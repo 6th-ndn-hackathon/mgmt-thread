@@ -25,7 +25,6 @@
 
 #include "ethernet-transport.hpp"
 #include "ethernet-protocol.hpp"
-#include "core/global-io.hpp"
 
 #include <pcap/pcap.h>
 
@@ -37,9 +36,11 @@ namespace face {
 
 NFD_LOG_INIT(EthernetTransport);
 
-EthernetTransport::EthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+EthernetTransport::EthernetTransport(boost::asio::io_service::strand& strand,
+                                     const ndn::net::NetworkInterface& localEndpoint,
                                      const ethernet::Address& remoteEndpoint)
-  : m_socket(getGlobalIoService())
+  : m_strand(strand)
+  , m_socket(strand.get_io_service())
   , m_pcap(localEndpoint.getName())
   , m_srcAddress(localEndpoint.getEthernetAddress())
   , m_destAddress(remoteEndpoint)
@@ -76,9 +77,7 @@ EthernetTransport::doClose()
 
   // Ensure that the Transport stays alive at least
   // until all pending handlers are dispatched
-  getGlobalIoService().post([this] {
-    this->setState(TransportState::CLOSED);
-  });
+  m_strand.post([this] { this->setState(TransportState::CLOSED); });
 }
 
 void

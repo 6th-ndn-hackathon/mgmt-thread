@@ -40,7 +40,7 @@ BOOST_FIXTURE_TEST_SUITE(TestForwarder, UnitTestTimeFixture)
 
 BOOST_AUTO_TEST_CASE(SimpleExchange)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   shared_ptr<Interest> interestAB = makeInterest("/A/B");
   interestAB->setInterestLifetime(time::seconds(4));
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(SimpleExchange)
 
 BOOST_AUTO_TEST_CASE(CsMatched)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(CsMatched)
 
 BOOST_AUTO_TEST_CASE(OutgoingInterest)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   forwarder.addFace(face1);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(OutgoingInterest)
 
 BOOST_AUTO_TEST_CASE(NextHopFaceId)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
 
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
@@ -178,9 +178,7 @@ BOOST_AUTO_TEST_CASE(NextHopFaceId)
 class ScopeLocalhostIncomingTestForwarder : public Forwarder
 {
 public:
-  ScopeLocalhostIncomingTestForwarder()
-  {
-  }
+  using Forwarder::Forwarder;
 
   void
   onDataUnsolicited(Face& inFace, const Data& data) override
@@ -202,7 +200,7 @@ public:
 
 BOOST_AUTO_TEST_CASE(ScopeLocalhostIncoming)
 {
-  ScopeLocalhostIncomingTestForwarder forwarder;
+  ScopeLocalhostIncomingTestForwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>("dummy://", "dummy://", ndn::nfd::FACE_SCOPE_LOCAL);
   auto face2 = make_shared<DummyFace>();
   forwarder.addFace(face1);
@@ -259,7 +257,7 @@ BOOST_AUTO_TEST_CASE(ScopeLocalhostIncoming)
 
 BOOST_AUTO_TEST_CASE(IncomingInterestStrategyDispatch)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   forwarder.addFace(face1);
@@ -302,7 +300,7 @@ BOOST_AUTO_TEST_CASE(IncomingInterestStrategyDispatch)
 
 BOOST_AUTO_TEST_CASE(IncomingData)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   auto face3 = make_shared<DummyFace>();
@@ -337,7 +335,7 @@ BOOST_AUTO_TEST_CASE(IncomingData)
 
 BOOST_AUTO_TEST_CASE(IncomingNack)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   auto face3 = make_shared<DummyFace>("dummy://", "dummy://",
@@ -420,7 +418,7 @@ BOOST_AUTO_TEST_CASE(IncomingNack)
 
 BOOST_AUTO_TEST_CASE(OutgoingNack)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   auto face3 = make_shared<DummyFace>("dummy://", "dummy://",
@@ -484,7 +482,7 @@ BOOST_AUTO_TEST_CASE(OutgoingNack)
 
 BOOST_AUTO_TEST_CASE(InterestLoopNack)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   auto face3 = make_shared<DummyFace>("dummy://", "dummy://",
@@ -535,7 +533,7 @@ BOOST_AUTO_TEST_CASE(InterestLoopNack)
 
 BOOST_FIXTURE_TEST_CASE(InterestLoopWithShortLifetime, UnitTestTimeFixture) // Bug 1953
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   auto face1 = make_shared<DummyFace>();
   auto face2 = make_shared<DummyFace>();
   forwarder.addFace(face1);
@@ -573,7 +571,7 @@ BOOST_FIXTURE_TEST_CASE(InterestLoopWithShortLifetime, UnitTestTimeFixture) // B
 
 BOOST_AUTO_TEST_CASE(PitLeak) // Bug 3484
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   shared_ptr<Face> face1 = make_shared<DummyFace>();
   forwarder.addFace(face1);
 

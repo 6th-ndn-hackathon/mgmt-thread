@@ -24,7 +24,6 @@
  */
 
 #include "internal-transport.hpp"
-#include "core/global-io.hpp"
 
 namespace nfd {
 namespace face {
@@ -71,12 +70,9 @@ InternalForwarderTransport::doClose()
   this->setState(TransportState::CLOSED);
 }
 
-static void
-asyncReceive(InternalTransportBase* recipient, const Block& packet)
+InternalClientTransport::InternalClientTransport(boost::asio::io_service::strand& strand)
+  : m_strand(strand)
 {
-  getGlobalIoService().post([packet, recipient] {
-    recipient->receiveFromLink(packet);
-  });
 }
 
 void
@@ -89,8 +85,16 @@ InternalClientTransport::connectToForwarder(InternalForwarderTransport* forwarde
   m_fwTransportStateConn.disconnect();
 
   if (forwarderTransport != nullptr) {
-    m_fwToClientTransmitConn = forwarderTransport->afterSend.connect(bind(&asyncReceive, this, _1));
-    m_clientToFwTransmitConn = this->afterSend.connect(bind(&asyncReceive, forwarderTransport, _1));
+    m_fwToClientTransmitConn = forwarderTransport->afterSend.connect([this] (const Block& packet) {
+      m_strand.post([this, packet] {
+        this->receiveFromLink(packet);
+      });
+    });
+    m_clientToFwTransmitConn = this->afterSend.connect([this, forwarderTransport] (const Block& packet) {
+      m_strand.post([forwarderTransport, packet] {
+        forwarderTransport->receiveFromLink(packet);
+      });
+    });
     m_fwTransportStateConn = forwarderTransport->afterStateChange.connect(
       [this] (TransportState oldState, TransportState newState) {
         if (newState == TransportState::CLOSED) {

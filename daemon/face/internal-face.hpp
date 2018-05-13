@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2015,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -43,7 +43,7 @@ namespace face {
  *  \return a forwarder-side face and a client-side face connected with each other
  */
 std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(ndn::KeyChain& clientKeyChain);
+makeInternalFace(boost::asio::io_service::strand& strand, ndn::KeyChain& clientKeyChain);
 
 } // namespace face
 } // namespace nfd

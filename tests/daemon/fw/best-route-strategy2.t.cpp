@@ -44,7 +44,8 @@ class BestRouteStrategy2Fixture : public UnitTestTimeFixture
 {
 protected:
   BestRouteStrategy2Fixture()
-    : strategy(forwarder)
+    : forwarder(g_strand)
+    , strategy(forwarder)
     , fib(forwarder.getFib())
     , pit(forwarder.getPit())
     , face1(make_shared<DummyFace>())

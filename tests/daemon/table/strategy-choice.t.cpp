@@ -37,7 +37,8 @@ class StrategyChoiceFixture : public BaseFixture
 {
 protected:
   StrategyChoiceFixture()
-    : sc(forwarder.getStrategyChoice())
+    : forwarder(g_strand)
+    , sc(forwarder.getStrategyChoice())
     , strategyNameP("/strategy-choice-P/%FD%00")
     , strategyNameQ("/strategy-choice-Q/%FD%00")
   {

@@ -28,7 +28,6 @@
 
 #include "transport.hpp"
 #include "socket-utils.hpp"
-#include "core/global-io.hpp"
 
 #include <array>
 
@@ -53,7 +52,7 @@ public:
    *  \param socket Protocol-specific socket for the created transport
    */
   explicit
-  DatagramTransport(typename protocol::socket&& socket);
+  DatagramTransport(boost::asio::io_service::strand& strand, typename protocol::socket&& socket);
 
   ssize_t
   getSendQueueLength() override;
@@ -92,6 +91,7 @@ protected:
   makeEndpointId(const typename protocol::endpoint& ep);
 
 protected:
+  boost::asio::io_service::strand& m_strand;
   typename protocol::socket m_socket;
   typename protocol::endpoint m_sender;
 
@@ -104,8 +104,10 @@ private:
 
 
 template<class T, class U>
-DatagramTransport<T, U>::DatagramTransport(typename DatagramTransport::protocol::socket&& socket)
-  : m_socket(std::move(socket))
+DatagramTransport<T, U>::DatagramTransport(boost::asio::io_service::strand& strand,
+                                           typename DatagramTransport::protocol::socket&& socket)
+  : m_strand(strand)
+  , m_socket(std::move(socket))
   , m_hasRecentlyReceived(false)
 {
   boost::asio::socket_base::send_buffer_size sendBufferSizeOption;
@@ -152,9 +154,7 @@ DatagramTransport<T, U>::doClose()
 
   // Ensure that the Transport stays alive at least until
   // all pending handlers are dispatched
-  getGlobalIoService().post([this] {
-    this->setState(TransportState::CLOSED);
-  });
+  m_strand.post([this] { this->setState(TransportState::CLOSED); });
 }
 
 template<class T, class U>

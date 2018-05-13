@@ -44,7 +44,7 @@ protected:
     if (port == 0)
       port = getNextPort();
 
-    return make_unique<WebSocketChannel>(websocket::Endpoint(addr, port));
+    return make_unique<WebSocketChannel>(g_strand, websocket::Endpoint(addr, port));
   }
 
   void

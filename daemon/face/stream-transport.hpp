@@ -28,7 +28,6 @@
 
 #include "transport.hpp"
 #include "socket-utils.hpp"
-#include "core/global-io.hpp"
 
 #include <queue>
 
@@ -50,7 +49,7 @@ public:
    *  \param socket Protocol-specific socket for the created transport
    */
   explicit
-  StreamTransport(typename protocol::socket&& socket);
+  StreamTransport(boost::asio::io_service::strand& strand, typename protocol::socket&& socket);
 
   ssize_t
   getSendQueueLength() override;
@@ -95,6 +94,7 @@ protected:
   getSendQueueBytes() const;
 
 protected:
+  boost::asio::io_service::strand& m_strand;
   typename protocol::socket m_socket;
 
   NFD_LOG_MEMBER_DECL();
@@ -108,8 +108,10 @@ private:
 
 
 template<class T>
-StreamTransport<T>::StreamTransport(typename StreamTransport::protocol::socket&& socket)
-  : m_socket(std::move(socket))
+StreamTransport<T>::StreamTransport(boost::asio::io_service::strand& strand,
+                                    typename StreamTransport::protocol::socket&& socket)
+  : m_strand(strand)
+  , m_socket(std::move(socket))
   , m_receiveBufferSize(0)
   , m_sendQueueBytes(0)
 {
@@ -148,7 +150,7 @@ StreamTransport<T>::doClose()
 
   // Ensure that the Transport stays alive at least until
   // all pending handlers are dispatched
-  getGlobalIoService().post([this] { deferredClose(); });
+  m_strand.post([this] { deferredClose(); });
 
   // Some bug or feature of Boost.Asio (see https://redmine.named-data.net/issues/1856):
   //

@@ -26,7 +26,6 @@
 #include "unix-stream-channel.hpp"
 #include "generic-link-service.hpp"
 #include "unix-stream-transport.hpp"
-#include "core/global-io.hpp"
 
 #include <boost/filesystem.hpp>
 #include <sys/stat.h> // for chmod()
@@ -36,11 +35,13 @@ namespace face {
 
 NFD_LOG_INIT(UnixStreamChannel);
 
-UnixStreamChannel::UnixStreamChannel(const unix_stream::Endpoint& endpoint,
+UnixStreamChannel::UnixStreamChannel(boost::asio::io_service::strand& strand,
+                                     const unix_stream::Endpoint& endpoint,
                                      bool wantCongestionMarking)
-  : m_endpoint(endpoint)
-  , m_acceptor(getGlobalIoService())
-  , m_socket(getGlobalIoService())
+  : m_strand(strand)
+  , m_endpoint(endpoint)
+  , m_acceptor(strand.get_io_service())
+  , m_socket(strand.get_io_service())
   , m_size(0)
   , m_wantCongestionMarking(wantCongestionMarking)
 {
@@ -77,7 +78,7 @@ UnixStreamChannel::listen(const FaceCreatedCallback& onFaceCreated,
 
   if (type == fs::socket_file) {
     boost::system::error_code error;
-    boost::asio::local::stream_protocol::socket socket(getGlobalIoService());
+    boost::asio::local::stream_protocol::socket socket(m_strand.get_io_service());
     socket.connect(m_endpoint, error);
     NFD_LOG_CHAN_TRACE("connect() on existing socket file returned: " << error.message());
     if (!error) {
@@ -137,7 +138,7 @@ UnixStreamChannel::handleAccept(const boost::system::error_code& error,
   GenericLinkService::Options options;
   options.allowCongestionMarking = m_wantCongestionMarking;
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<UnixStreamTransport>(std::move(m_socket));
+  auto transport = make_unique<UnixStreamTransport>(m_strand, std::move(m_socket));
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   ++m_size;

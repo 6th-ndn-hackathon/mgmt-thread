@@ -64,7 +64,9 @@ public:
    * To enable creation of faces upon incoming connections, one
    * needs to explicitly call UnixStreamChannel::listen method.
    */
-  UnixStreamChannel(const unix_stream::Endpoint& endpoint, bool wantCongestionMarking);
+  UnixStreamChannel(boost::asio::io_service::strand& strand,
+                    const unix_stream::Endpoint& endpoint,
+                    bool wantCongestionMarking);
 
   ~UnixStreamChannel() override;
 
@@ -111,6 +113,7 @@ private:
                const FaceCreationFailedCallback& onAcceptFailed);
 
 private:
+  boost::asio::io_service::strand& m_strand;
   const unix_stream::Endpoint m_endpoint;
   boost::asio::local::stream_protocol::acceptor m_acceptor;
   boost::asio::local::stream_protocol::socket m_socket;

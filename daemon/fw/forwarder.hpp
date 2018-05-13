@@ -55,7 +55,8 @@ class Strategy;
 class Forwarder
 {
 public:
-  Forwarder();
+  explicit
+  Forwarder(boost::asio::io_service::strand& strand);
 
   VIRTUAL_WITH_TESTS
   ~Forwarder();

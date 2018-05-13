@@ -61,7 +61,8 @@ public:
                  const ethernet::Address& sender);
 
 protected:
-  EthernetTransport(const ndn::net::NetworkInterface& localEndpoint,
+  EthernetTransport(boost::asio::io_service::strand& strand,
+                    const ndn::net::NetworkInterface& localEndpoint,
                     const ethernet::Address& remoteEndpoint);
 
   void
@@ -99,6 +100,7 @@ private:
   handleError(const std::string& errorMessage);
 
 protected:
+  boost::asio::io_service::strand& m_strand;
   boost::asio::posix::stream_descriptor m_socket;
   PcapHelper m_pcap;
   ethernet::Address m_srcAddress;

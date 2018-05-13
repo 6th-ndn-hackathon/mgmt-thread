@@ -41,7 +41,7 @@ BOOST_FIXTURE_TEST_SUITE(TestRetxSuppression, UnitTestTimeFixture)
 
 BOOST_AUTO_TEST_CASE(Fixed)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   Pit& pit = forwarder.getPit();
   static const time::milliseconds MIN_RETX_INTERVAL(200);
   RetxSuppressionFixed rs(MIN_RETX_INTERVAL);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(Fixed)
 
 BOOST_AUTO_TEST_CASE(Exponential)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   Pit& pit = forwarder.getPit();
   RetxSuppressionExponential rs(time::milliseconds(10), 3.0, time::milliseconds(100));
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(Exponential)
 
 BOOST_AUTO_TEST_CASE(ExponentialPerUpstream)
 {
-  Forwarder forwarder;
+  Forwarder forwarder(g_strand);
   Pit& pit = forwarder.getPit();
   RetxSuppressionExponential rs(time::milliseconds(10), 3.0, time::milliseconds(100));
 

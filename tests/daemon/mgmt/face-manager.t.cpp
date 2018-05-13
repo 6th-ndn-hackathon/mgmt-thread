@@ -44,7 +44,7 @@ class FaceManagerFixture : public NfdManagerCommonFixture
 public:
   FaceManagerFixture()
     : m_faceTable(m_forwarder.getFaceTable())
-    , m_faceSystem(m_faceTable, make_shared<ndn::net::NetworkMonitorStub>(0))
+    , m_faceSystem(g_strand, m_faceTable, make_shared<ndn::net::NetworkMonitorStub>(0))
     , m_manager(m_faceSystem, m_dispatcher, *m_authenticator)
   {
     setTopPrefix();

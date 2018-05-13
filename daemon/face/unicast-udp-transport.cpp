@@ -38,10 +38,11 @@ namespace face {
 
 NFD_LOG_MEMBER_INIT_SPECIALIZED((DatagramTransport<boost::asio::ip::udp, Unicast>), UnicastUdpTransport);
 
-UnicastUdpTransport::UnicastUdpTransport(protocol::socket&& socket,
+UnicastUdpTransport::UnicastUdpTransport(boost::asio::io_service::strand& strand,
+                                         protocol::socket&& socket,
                                          ndn::nfd::FacePersistency persistency,
                                          time::nanoseconds idleTimeout)
-  : DatagramTransport(std::move(socket))
+  : DatagramTransport(strand, std::move(socket))
   , m_idleTimeout(idleTimeout)
 {
   this->setLocalUri(FaceUri(m_socket.local_endpoint()));

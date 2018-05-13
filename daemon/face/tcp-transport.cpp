@@ -39,8 +39,9 @@ time::milliseconds TcpTransport::s_initialReconnectWait = time::seconds(1);
 time::milliseconds TcpTransport::s_maxReconnectWait = time::minutes(5);
 float TcpTransport::s_reconnectWaitMultiplier = 2.0f;
 
-TcpTransport::TcpTransport(protocol::socket&& socket, ndn::nfd::FacePersistency persistency, ndn::nfd::FaceScope faceScope)
-  : StreamTransport(std::move(socket))
+TcpTransport::TcpTransport(boost::asio::io_service::strand& strand, protocol::socket&& socket,
+                           ndn::nfd::FacePersistency persistency, ndn::nfd::FaceScope faceScope)
+  : StreamTransport(strand, std::move(socket))
   , m_remoteEndpoint(m_socket.remote_endpoint())
   , m_nextReconnectWait(s_initialReconnectWait)
 {
@@ -107,7 +108,7 @@ TcpTransport::handleError(const boost::system::error_code& error)
     m_socket.cancel(error);
 
     // do this asynchronously because there could be some callbacks still pending
-    getGlobalIoService().post([this] { reconnect(); });
+    m_strand.post([this] { reconnect(); });
   }
   else {
     StreamTransport::handleError(error);
@@ -178,7 +179,7 @@ TcpTransport::handleReconnectTimeout()
                s_maxReconnectWait);
 
   // do this asynchronously because there could be some callbacks still pending
-  getGlobalIoService().post([this] { reconnect(); });
+  m_strand.post([this] { reconnect(); });
 }
 
 void

@@ -164,6 +164,7 @@ public:
   }
 
 private:
+  boost::asio::io_service::strand m_strand;
   shared_ptr<Face> m_face;
   face::InternalForwarderTransport* m_forwarderTransport;
   shared_ptr<face::InternalClientTransport> m_clientTransport;
@@ -189,6 +190,8 @@ using TopologyPcapTimestamp = ndn::SimpleTag<time::steady_clock::TimePoint, 0>;
 class TopologyTester : noncopyable
 {
 public:
+  TopologyTester();
+
   /** \brief creates a forwarder
    *  \return index of new forwarder
    */
@@ -270,6 +273,7 @@ public:
                       size_t n, int seq = -1);
 
 private:
+  boost::asio::io_service::strand m_strand;
   bool m_wantPcap = false;
   std::vector<unique_ptr<Forwarder>> m_forwarders;
   std::vector<std::string> m_forwarderLabels;

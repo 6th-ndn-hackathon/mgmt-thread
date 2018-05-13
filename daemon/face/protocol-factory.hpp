@@ -45,6 +45,7 @@ namespace face {
  */
 struct ProtocolFactoryCtorParams
 {
+  boost::asio::io_service::strand& strand;
   FaceCreatedCallback addFace;
   shared_ptr<ndn::net::NetworkMonitor> netmon;
 };
@@ -177,7 +178,7 @@ private: // registry
   getRegistry();
 
 protected:
-  std::set<std::string> providedSchemes; ///< FaceUri schemes provided by this ProtocolFactory
+  boost::asio::io_service::strand& m_strand;
   FaceCreatedCallback addFace; ///< callback when a new face is created
 
   /** \brief NetworkMonitor for listing available network interfaces and monitoring their changes
@@ -186,6 +187,8 @@ protected:
    *  to usage.
    */
   shared_ptr<ndn::net::NetworkMonitor> netmon;
+
+  std::set<std::string> providedSchemes; ///< FaceUri schemes provided by this ProtocolFactory
 };
 
 } // namespace face

@@ -26,7 +26,6 @@
 #include "nfd.hpp"
 
 #include "core/config-file.hpp"
-#include "core/global-io.hpp"
 #include "core/log-config-section.hpp"
 #include "core/privilege-helper.hpp"
 #include "face/face-system.hpp"
@@ -77,12 +76,12 @@ Nfd::initialize()
 {
   configureLogging();
 
-  m_forwarder = make_unique<Forwarder>();
+  m_forwarder = make_unique<Forwarder>(m_fwStrand);
 
   FaceTable& faceTable = m_forwarder->getFaceTable();
   faceTable.addReserved(face::makeNullFace(), face::FACEID_NULL);
   faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
-  m_faceSystem = make_unique<face::FaceSystem>(faceTable, m_netmon);
+  m_faceSystem = make_unique<face::FaceSystem>(m_fwStrand, faceTable, m_netmon);
 
   initializeManagement();
 
@@ -133,7 +132,7 @@ ignoreRibAndLogSections(const std::string& filename, const std::string& sectionN
 void
 Nfd::initializeManagement()
 {
-  std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_keyChain);
+  std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_fwStrand, m_keyChain);
   m_forwarder->getFaceTable().addReserved(m_internalFace, face::FACEID_INTERNAL_FACE);
 
   m_dispatcher = make_unique<ndn::mgmt::Dispatcher>(*m_internalClientFace, m_keyChain);

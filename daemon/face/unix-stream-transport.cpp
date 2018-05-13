@@ -30,8 +30,8 @@ namespace face {
 
 NFD_LOG_MEMBER_INIT_SPECIALIZED(StreamTransport<boost::asio::local::stream_protocol>, UnixStreamTransport);
 
-UnixStreamTransport::UnixStreamTransport(protocol::socket&& socket)
-  : StreamTransport(std::move(socket))
+UnixStreamTransport::UnixStreamTransport(boost::asio::io_service::strand& strand, protocol::socket&& socket)
+  : StreamTransport(strand, std::move(socket))
 {
   static_assert(
     std::is_same<std::remove_cv<protocol::socket::native_handle_type>::type, int>::value,

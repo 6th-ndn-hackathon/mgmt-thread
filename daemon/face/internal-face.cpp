@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2015,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -26,13 +26,12 @@
 #include "internal-face.hpp"
 #include "generic-link-service.hpp"
 #include "internal-transport.hpp"
-#include "core/global-io.hpp"
 
 namespace nfd {
 namespace face {
 
 std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(ndn::KeyChain& clientKeyChain)
+makeInternalFace(boost::asio::io_service::strand& strand, ndn::KeyChain& clientKeyChain)
 {
   GenericLinkService::Options serviceOpts;
   serviceOpts.allowLocalFields = true;
@@ -41,10 +40,10 @@ makeInternalFace(ndn::KeyChain& clientKeyChain)
                                 make_unique<InternalForwarderTransport>());
 
   auto forwarderTransport = static_cast<InternalForwarderTransport*>(face->getTransport());
-  auto clientTransport = make_shared<InternalClientTransport>();
+  auto clientTransport = make_shared<InternalClientTransport>(strand);
   clientTransport->connectToForwarder(forwarderTransport);
 
-  auto clientFace = make_shared<ndn::Face>(clientTransport, getGlobalIoService(), clientKeyChain);
+  auto clientFace = make_shared<ndn::Face>(clientTransport, strand.get_io_service(), clientKeyChain);
 
   return std::make_tuple(face, clientFace);
 }

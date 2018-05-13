@@ -364,12 +364,11 @@ BOOST_FIXTURE_TEST_CASE(ProbingInterval, AsfStrategyParametersGridFixture)
   BOOST_CHECK_EQUAL(linkAC->getFace(nodeA).getCounters().nOutInterests, 1);
 }
 
-class ParametersFixture
+BOOST_FIXTURE_TEST_CASE(InstantiationTest, BaseFixture)
 {
-public:
-  void
-  checkValidity(std::string parameters, bool isCorrect)
-  {
+  Forwarder forwarder(g_strand);
+
+  auto checkValidity = [&] (const std::string& parameters, bool isCorrect) {
     Name strategyName(Name(AsfStrategy::getStrategyName()).append(parameters));
     if (isCorrect) {
       BOOST_CHECK_NO_THROW(make_unique<AsfStrategy>(forwarder, strategyName));
@@ -377,14 +376,8 @@ public:
     else {
       BOOST_CHECK_THROW(make_unique<AsfStrategy>(forwarder, strategyName), std::invalid_argument);
     }
-  }
+  };
 
-protected:
-  Forwarder forwarder;
-};
-
-BOOST_FIXTURE_TEST_CASE(InstantiationTest, ParametersFixture)
-{
   checkValidity("/probing-interval~30000/n-silent-timeouts~5", true);
   checkValidity("/n-silent-timeouts~5/probing-interval~30000", true);
   checkValidity("/probing-interval~30000", true);

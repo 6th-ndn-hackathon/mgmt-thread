@@ -27,7 +27,6 @@
 #include "ethernet-protocol.hpp"
 #include "generic-link-service.hpp"
 #include "unicast-ethernet-transport.hpp"
-#include "core/global-io.hpp"
 
 #include <boost/range/adaptor/map.hpp>
 #include <pcap/pcap.h>
@@ -37,11 +36,13 @@ namespace face {
 
 NFD_LOG_INIT(EthernetChannel);
 
-EthernetChannel::EthernetChannel(shared_ptr<const ndn::net::NetworkInterface> localEndpoint,
+EthernetChannel::EthernetChannel(boost::asio::io_service::strand& strand,
+                                 shared_ptr<const ndn::net::NetworkInterface> localEndpoint,
                                  time::nanoseconds idleTimeout)
-  : m_localEndpoint(std::move(localEndpoint))
+  : m_strand(strand)
+  , m_localEndpoint(std::move(localEndpoint))
   , m_isListening(false)
-  , m_socket(getGlobalIoService())
+  , m_socket(strand.get_io_service())
   , m_pcap(m_localEndpoint->getName())
   , m_idleFaceTimeout(idleTimeout)
 #ifdef _DEBUG
@@ -204,7 +205,7 @@ EthernetChannel::createFace(const ethernet::Address& remoteEndpoint,
   options.reliabilityOptions.isEnabled = params.wantLpReliability;
 
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<UnicastEthernetTransport>(*m_localEndpoint, remoteEndpoint,
+  auto transport = make_unique<UnicastEthernetTransport>(m_strand, *m_localEndpoint, remoteEndpoint,
                                                          params.persistency, m_idleFaceTimeout);
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 

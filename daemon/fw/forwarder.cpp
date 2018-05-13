@@ -43,8 +43,9 @@ getDefaultStrategyName()
   return fw::BestRouteStrategy2::getStrategyName();
 }
 
-Forwarder::Forwarder()
-  : m_unsolicitedDataPolicy(new fw::DefaultUnsolicitedDataPolicy())
+Forwarder::Forwarder(boost::asio::io_service::strand& strand)
+  : m_faceTable(strand)
+  , m_unsolicitedDataPolicy(make_unique<fw::DefaultUnsolicitedDataPolicy>())
   , m_fib(m_nameTree)
   , m_pit(m_nameTree)
   , m_measurements(m_nameTree)

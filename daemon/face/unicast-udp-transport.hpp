@@ -40,7 +40,8 @@ NFD_LOG_MEMBER_DECL_SPECIALIZED((DatagramTransport<boost::asio::ip::udp, Unicast
 class UnicastUdpTransport final : public DatagramTransport<boost::asio::ip::udp, Unicast>
 {
 public:
-  UnicastUdpTransport(protocol::socket&& socket,
+  UnicastUdpTransport(boost::asio::io_service::strand& strand,
+                      protocol::socket&& socket,
                       ndn::nfd::FacePersistency persistency,
                       time::nanoseconds idleTimeout);
 

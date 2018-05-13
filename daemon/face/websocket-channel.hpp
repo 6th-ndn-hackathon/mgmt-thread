@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2017,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -50,8 +50,8 @@ public:
    * one needs to explicitly call WebSocketChannel::listen method.
    * The created channel is bound to the localEndpoint.
    */
-  explicit
-  WebSocketChannel(const websocket::Endpoint& localEndpoint);
+  WebSocketChannel(boost::asio::io_service::strand& strand,
+                   const websocket::Endpoint& localEndpoint);
 
   bool
   isListening() const override
@@ -103,6 +103,7 @@ private:
   handleClose(websocketpp::connection_hdl hdl);
 
 private:
+  boost::asio::io_service::strand& m_strand;
   const websocket::Endpoint m_localEndpoint;
   websocket::Server m_server;
   std::map<websocketpp::connection_hdl, shared_ptr<Face>,

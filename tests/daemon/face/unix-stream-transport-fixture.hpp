@@ -112,7 +112,7 @@ protected:
 
     localEp = sock.local_endpoint();
     face = make_unique<Face>(make_unique<DummyReceiveLinkService>(),
-                             make_unique<UnixStreamTransport>(std::move(sock)));
+                             make_unique<UnixStreamTransport>(g_strand, std::move(sock)));
     transport = static_cast<UnixStreamTransport*>(face->getTransport());
     receivedPackets = &static_cast<DummyReceiveLinkService*>(face->getLinkService())->receivedPackets;
 

@@ -66,7 +66,8 @@ public:
    * \param sendSocket socket used to send to the multicast group
    * \param linkType either `ndn::nfd::LINK_TYPE_MULTI_ACCESS` or `ndn::nfd::LINK_TYPE_AD_HOC`
    */
-  MulticastUdpTransport(const protocol::endpoint& multicastGroup,
+  MulticastUdpTransport(boost::asio::io_service::strand& strand,
+                        const protocol::endpoint& multicastGroup,
                         protocol::socket&& recvSocket,
                         protocol::socket&& sendSocket,
                         ndn::nfd::LinkType linkType);
