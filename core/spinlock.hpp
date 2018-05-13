@@ -31,24 +31,24 @@
 
 namespace nfd {
 
-class Spinlock {
-
+class Spinlock
+{
 public:
-  Spinlock()
-    : m_flag(ATOMIC_FLAG_INIT)
+  void
+  lock() noexcept
   {
+    while (m_flag.test_and_set(std::memory_order_acquire))
+      ;
   }
 
-  void lock() noexcept {
-    while( m_flag.test_and_set() );
-  }
-
-  void unlock() noexcept {
-    m_flag.clear();
+  void
+  unlock() noexcept
+  {
+    m_flag.clear(std::memory_order_release);
   }
 
 private:
-  std::atomic_flag m_flag;
+  std::atomic_flag m_flag = ATOMIC_FLAG_INIT;
 };
 
 Spinlock&
