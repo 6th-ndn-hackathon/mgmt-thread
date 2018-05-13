@@ -24,7 +24,9 @@
  */
 
 #include "cs-manager.hpp"
+#include "core/spinlock.hpp"
 #include <ndn-cxx/mgmt/nfd/cs-info.hpp>
+#include <mutex>
 
 namespace nfd {
 

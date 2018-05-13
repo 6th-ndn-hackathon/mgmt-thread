@@ -29,9 +29,12 @@
 #include "best-route-strategy2.hpp"
 #include "strategy.hpp"
 #include "core/logger.hpp"
+#include "core/spinlock.hpp"
 #include "table/cleanup.hpp"
 
 #include <ndn-cxx/lp/tags.hpp>
+
+#include <mutex>
 
 namespace nfd {
 

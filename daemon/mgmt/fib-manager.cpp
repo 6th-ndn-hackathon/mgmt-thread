@@ -26,12 +26,15 @@
 #include "fib-manager.hpp"
 
 #include "core/logger.hpp"
+#include "core/spinlock.hpp"
 #include "fw/face-table.hpp"
 
 #include <ndn-cxx/lp/tags.hpp>
 #include <ndn-cxx/mgmt/nfd/fib-entry.hpp>
 
 #include <boost/range/adaptor/transformed.hpp>
+
+#include <mutex>
 
 namespace nfd {
 
