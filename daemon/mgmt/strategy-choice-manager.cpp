@@ -92,6 +92,7 @@ StrategyChoiceManager::unsetStrategy(ControlParameters parameters,
 void
 StrategyChoiceManager::listChoices(ndn::mgmt::StatusDatasetContext& context)
 {
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   for (const auto& i : m_table) {
     ndn::nfd::StrategyChoice entry;
     entry.setName(i.getPrefix())

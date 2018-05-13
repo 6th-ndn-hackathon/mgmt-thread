@@ -107,6 +107,7 @@ void
 CsManager::serveInfo(const Name& topPrefix, const Interest& interest,
                      ndn::mgmt::StatusDatasetContext& context) const
 {
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   ndn::nfd::CsInfo info;
   info.setCapacity(m_cs.getLimit());
   info.setEnableAdmit(m_cs.shouldAdmit());

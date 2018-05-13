@@ -126,6 +126,7 @@ void
 FibManager::listEntries(const Name& topPrefix, const Interest& interest,
                         ndn::mgmt::StatusDatasetContext& context)
 {
+  std::lock_guard<Spinlock> lock(getGlobalSpinlock());
   for (const auto& entry : m_fib) {
     const auto& nexthops = entry.getNextHops() |
                            boost::adaptors::transformed([] (const fib::NextHop& nh) {
