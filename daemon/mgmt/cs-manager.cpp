@@ -78,8 +78,10 @@ CsManager::erase(const ControlParameters& parameters,
   size_t count = parameters.hasCount() ?
                  parameters.getCount() :
                  std::numeric_limits<size_t>::max();
+  getGlobalSpinlock().lock();
   m_cs.erase(parameters.getName(), std::min(count, ERASE_LIMIT),
     [=] (size_t nErased) {
+      getGlobalSpinlock().unlock();
       ControlParameters body;
       body.setName(parameters.getName());
       body.setCount(nErased);
