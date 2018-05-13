@@ -57,7 +57,8 @@ protected:
 class InternalForwarderTransport : public Transport, public InternalTransportBase
 {
 public:
-  InternalForwarderTransport(const FaceUri& localUri = FaceUri("internal://"),
+  InternalForwarderTransport(boost::asio::io_service::strand& strand,
+                             const FaceUri& localUri = FaceUri("internal://"),
                              const FaceUri& remoteUri = FaceUri("internal://"),
                              ndn::nfd::FaceScope scope = ndn::nfd::FACE_SCOPE_LOCAL,
                              ndn::nfd::LinkType linkType = ndn::nfd::LINK_TYPE_POINT_TO_POINT);
@@ -75,6 +76,8 @@ private:
 
 private:
   NFD_LOG_MEMBER_DECL();
+
+  boost::asio::io_service::strand& m_strand;
 };
 
 /** \brief implements a client-side transport that can be paired with another
@@ -121,8 +124,6 @@ public:
   send(const Block& header, const Block& payload) override;
 
 private:
-  NFD_LOG_MEMBER_DECL();
-
   boost::asio::io_service::strand& m_strand;
 
   signal::ScopedConnection m_fwToClientTransmitConn;

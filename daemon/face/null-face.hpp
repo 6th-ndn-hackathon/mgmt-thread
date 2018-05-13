@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2015,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -34,7 +34,8 @@ namespace face {
 /** \return a Face that has no underlying transport and drops every packet
  */
 shared_ptr<Face>
-makeNullFace(const FaceUri& uri = FaceUri("null://"));
+makeNullFace(boost::asio::io_service::strand& strand,
+             const FaceUri& uri = FaceUri("null://"));
 
 } // namespace face
 } // namespace nfd

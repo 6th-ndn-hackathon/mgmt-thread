@@ -190,8 +190,8 @@ TopologyTester::addLink(const std::string& label, time::nanoseconds delay,
 
     unique_ptr<GenericLinkService> service = m_wantPcap ? make_unique<TopologyPcapLinkService>() :
                                                           make_unique<GenericLinkService>();
-    auto transport = make_unique<InternalForwarderTransport>(localUri, remoteUri,
-                     ndn::nfd::FACE_SCOPE_NON_LOCAL, linkType);
+    auto transport = make_unique<InternalForwarderTransport>(m_strand, localUri, remoteUri,
+                                                             ndn::nfd::FACE_SCOPE_NON_LOCAL, linkType);
     auto face = make_shared<Face>(std::move(service), std::move(transport));
 
     forwarder.addFace(face);
@@ -211,8 +211,9 @@ TopologyTester::addAppFace(const std::string& label, TopologyNode i)
 
   unique_ptr<GenericLinkService> service = m_wantPcap ? make_unique<TopologyPcapLinkService>() :
                                                         make_unique<GenericLinkService>();
-  auto transport = make_unique<InternalForwarderTransport>(localUri, remoteUri,
-                   ndn::nfd::FACE_SCOPE_LOCAL, ndn::nfd::LINK_TYPE_POINT_TO_POINT);
+  auto transport = make_unique<InternalForwarderTransport>(m_strand, localUri, remoteUri,
+                                                           ndn::nfd::FACE_SCOPE_LOCAL,
+                                                           ndn::nfd::LINK_TYPE_POINT_TO_POINT);
   auto face = make_shared<Face>(std::move(service), std::move(transport));
 
   forwarder.addFace(face);

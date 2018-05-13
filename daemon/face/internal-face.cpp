@@ -31,21 +31,21 @@ namespace nfd {
 namespace face {
 
 std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(boost::asio::io_service::strand& strand, ndn::KeyChain& clientKeyChain)
+makeInternalFace(boost::asio::io_service::strand& fwStrand,
+                 boost::asio::io_service::strand& mgmtStrand,
+                 ndn::KeyChain& clientKeyChain)
 {
   GenericLinkService::Options serviceOpts;
   serviceOpts.allowLocalFields = true;
+  auto fwFace = make_shared<Face>(make_unique<GenericLinkService>(serviceOpts),
+                                  make_unique<InternalForwarderTransport>(fwStrand));
+  auto fwTransport = static_cast<InternalForwarderTransport*>(fwFace->getTransport());
 
-  auto face = make_shared<Face>(make_unique<GenericLinkService>(serviceOpts),
-                                make_unique<InternalForwarderTransport>());
+  auto clientTransport = make_shared<InternalClientTransport>(mgmtStrand);
+  clientTransport->connectToForwarder(fwTransport);
+  auto clientFace = make_shared<ndn::Face>(clientTransport, mgmtStrand.get_io_service(), clientKeyChain);
 
-  auto forwarderTransport = static_cast<InternalForwarderTransport*>(face->getTransport());
-  auto clientTransport = make_shared<InternalClientTransport>(strand);
-  clientTransport->connectToForwarder(forwarderTransport);
-
-  auto clientFace = make_shared<ndn::Face>(clientTransport, strand.get_io_service(), clientKeyChain);
-
-  return std::make_tuple(face, clientFace);
+  return std::make_tuple(fwFace, clientFace);
 }
 
 } // namespace face

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2015,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -40,7 +40,7 @@ using nfd::Face;
 
 BOOST_AUTO_TEST_CASE(StaticProperties)
 {
-  shared_ptr<Face> face = makeNullFace(FaceUri("testnull://hhppt12sy"));
+  shared_ptr<Face> face = makeNullFace(g_strand, FaceUri("testnull://hhppt12sy"));
   checkStaticPropertiesInitialized(*face->getTransport());
 
   BOOST_CHECK_EQUAL(face->getLocalUri(), FaceUri("testnull://hhppt12sy"));
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(StaticProperties)
 
 BOOST_AUTO_TEST_CASE(Send)
 {
-  shared_ptr<Face> face = makeNullFace();
+  shared_ptr<Face> face = makeNullFace(g_strand);
 
   shared_ptr<Interest> interest = makeInterest("/A");
   BOOST_CHECK_NO_THROW(face->sendInterest(*interest));

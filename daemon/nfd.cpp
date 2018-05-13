@@ -79,8 +79,8 @@ Nfd::initialize()
   m_forwarder = make_unique<Forwarder>(m_fwStrand);
 
   FaceTable& faceTable = m_forwarder->getFaceTable();
-  faceTable.addReserved(face::makeNullFace(), face::FACEID_NULL);
-  faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
+  faceTable.addReserved(face::makeNullFace(m_fwStrand), face::FACEID_NULL);
+  faceTable.addReserved(face::makeNullFace(m_fwStrand, FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
   m_faceSystem = make_unique<face::FaceSystem>(m_fwStrand, faceTable, m_netmon);
 
   initializeManagement();
@@ -132,7 +132,7 @@ ignoreRibAndLogSections(const std::string& filename, const std::string& sectionN
 void
 Nfd::initializeManagement()
 {
-  std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_fwStrand, m_keyChain);
+  std::tie(m_internalFace, m_internalClientFace) = face::makeInternalFace(m_fwStrand, m_mgmtStrand, m_keyChain);
   m_forwarder->getFaceTable().addReserved(m_internalFace, face::FACEID_INTERNAL_FACE);
 
   m_dispatcher = make_unique<ndn::mgmt::Dispatcher>(*m_internalClientFace, m_keyChain);

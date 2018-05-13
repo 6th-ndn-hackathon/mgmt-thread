@@ -29,10 +29,11 @@ namespace nfd {
 namespace face {
 
 NFD_LOG_MEMBER_INIT(InternalForwarderTransport, InternalForwarderTransport);
-NFD_LOG_MEMBER_INIT(InternalClientTransport, InternalClientTransport);
 
-InternalForwarderTransport::InternalForwarderTransport(const FaceUri& localUri, const FaceUri& remoteUri,
+InternalForwarderTransport::InternalForwarderTransport(boost::asio::io_service::strand& strand,
+                                                       const FaceUri& localUri, const FaceUri& remoteUri,
                                                        ndn::nfd::FaceScope scope, ndn::nfd::LinkType linkType)
+  : m_strand(strand)
 {
   this->setLocalUri(localUri);
   this->setRemoteUri(remoteUri);
@@ -49,9 +50,11 @@ InternalForwarderTransport::receiveFromLink(const Block& packet)
 {
   NFD_LOG_FACE_TRACE(__func__);
 
-  Packet p;
-  p.packet = packet;
-  this->receive(std::move(p));
+  m_strand.dispatch([this, packet] {
+    Packet p;
+    p.packet = packet;
+    this->receive(std::move(p));
+  });
 }
 
 void
@@ -78,22 +81,16 @@ InternalClientTransport::InternalClientTransport(boost::asio::io_service::strand
 void
 InternalClientTransport::connectToForwarder(InternalForwarderTransport* forwarderTransport)
 {
-  NFD_LOG_DEBUG(__func__ << " " << forwarderTransport);
-
   m_fwToClientTransmitConn.disconnect();
   m_clientToFwTransmitConn.disconnect();
   m_fwTransportStateConn.disconnect();
 
   if (forwarderTransport != nullptr) {
     m_fwToClientTransmitConn = forwarderTransport->afterSend.connect([this] (const Block& packet) {
-      m_strand.post([this, packet] {
-        this->receiveFromLink(packet);
-      });
+      this->receiveFromLink(packet);
     });
-    m_clientToFwTransmitConn = this->afterSend.connect([this, forwarderTransport] (const Block& packet) {
-      m_strand.post([forwarderTransport, packet] {
-        forwarderTransport->receiveFromLink(packet);
-      });
+    m_clientToFwTransmitConn = this->afterSend.connect([forwarderTransport] (const Block& packet) {
+      forwarderTransport->receiveFromLink(packet);
     });
     m_fwTransportStateConn = forwarderTransport->afterStateChange.connect(
       [this] (TransportState oldState, TransportState newState) {
@@ -108,7 +105,7 @@ void
 InternalClientTransport::receiveFromLink(const Block& packet)
 {
   if (m_receiveCallback) {
-    m_receiveCallback(packet);
+    m_strand.dispatch([this, packet] { m_receiveCallback(packet); });
   }
 }
 

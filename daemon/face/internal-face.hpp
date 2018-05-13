@@ -43,7 +43,9 @@ namespace face {
  *  \return a forwarder-side face and a client-side face connected with each other
  */
 std::tuple<shared_ptr<Face>, shared_ptr<ndn::Face>>
-makeInternalFace(boost::asio::io_service::strand& strand, ndn::KeyChain& clientKeyChain);
+makeInternalFace(boost::asio::io_service::strand& fwStrand,
+                 boost::asio::io_service::strand& mgmtStrand,
+                 ndn::KeyChain& clientKeyChain);
 
 } // namespace face
 } // namespace nfd

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014-2015,  Regents of the University of California,
+/*
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -34,10 +34,11 @@ namespace face {
 // NullFace has scope=local to enable creating a "blackhole" FIB entry under /localhost.
 
 shared_ptr<Face>
-makeNullFace(const FaceUri& uri)
+makeNullFace(boost::asio::io_service::strand& strand, const FaceUri& uri)
 {
   return make_shared<Face>(make_unique<GenericLinkService>(),
-                           make_unique<InternalForwarderTransport>(uri, uri, ndn::nfd::FACE_SCOPE_LOCAL));
+                           make_unique<InternalForwarderTransport>(strand, uri, uri,
+                                                                   ndn::nfd::FACE_SCOPE_LOCAL));
 }
 
 } // namespace face

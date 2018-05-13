@@ -42,7 +42,7 @@ class InternalFaceFixture : public UnitTestTimeFixture
 public:
   InternalFaceFixture()
   {
-    std::tie(forwarderFace, clientFace) = makeInternalFace(g_strand, m_keyChain);
+    std::tie(forwarderFace, clientFace) = makeInternalFace(g_strand, g_strand, m_keyChain);
 
     forwarderFace->afterReceiveInterest.connect(
       [this] (const Interest& interest) { receivedInterests.push_back(interest); } );
